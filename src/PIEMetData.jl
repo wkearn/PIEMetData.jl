@@ -2,7 +2,7 @@ module PIEMetData
 
 using DataFrames, Base.Dates
 
-export parsemet
+export parsemet, setmetdatadir!
 
 met_data_directory = Dict(:_METDATA_DIR="")
 
