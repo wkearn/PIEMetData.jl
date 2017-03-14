@@ -4,7 +4,7 @@ using DataFrames, Base.Dates
 
 export parsemet, setmetdatadir!
 
-met_data_directory = Dict(:_METDATA_DIR="")
+met_data_directory = Dict(:_METDATA_DIR=>"")
 
 function setmetdatadir!(path,datavars=data_directories)
     datavars[:_METDATA_DIR] = path
