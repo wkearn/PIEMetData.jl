@@ -1,5 +1,5 @@
 using PIEMetData
 using Base.Test
 
-# write your own tests here
-@test 1 == 2
+setmetdatadir!(Pkg.dir("TidalFluxExampleData","data","met"))
+parsemet(2016)
