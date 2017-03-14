@@ -6,7 +6,7 @@ export parsemet, setmetdatadir!
 
 met_data_directory = Dict(:_METDATA_DIR=>"")
 
-function setmetdatadir!(path,datavars=data_directories)
+function setmetdatadir!(path,datavars=met_data_directory)
     datavars[:_METDATA_DIR] = path
 end
 
