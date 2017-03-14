@@ -30,7 +30,7 @@ function timepad(ds)
     map(x->lpad(string(x),4,'0'),ds)
 end
 
-function parsemet(year::Int,metdatadir=data_directories[:_METDATA_DIR])
+function parsemet(year::Int,metdatadir=met_data_directory[:_METDATA_DIR])
     M = readtable(joinpath(metdatadir,string(year),"met.csv"))
     n = size(M,1)
     M[:Date] = map(x->doy2date(M[x,:Year],M[x,:Day]),1:n)
