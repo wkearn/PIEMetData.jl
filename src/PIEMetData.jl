@@ -4,6 +4,12 @@ using DataFrames, Base.Dates
 
 export parsemet
 
+met_data_directory = Dict(:_METDATA_DIR="")
+
+function setmetdatadir!(path,datavars=data_directories)
+    datavars[:_METDATA_DIR] = path
+end
+
 doy(t::DateTime) = dayofyear(t) + (hour(t)+minute(t)/60)/24
 
 function doy2date(y,d)
