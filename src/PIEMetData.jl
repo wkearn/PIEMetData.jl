@@ -31,6 +31,8 @@ function timepad(ds)
 end
 
 function parsemet(year::Int,metdatadir=met_data_directory[:_METDATA_DIR])
+    ys = parse.(readdir(metdatadir))
+    in(year,ys) || error("met data requested for unavailable year: $year")
     M = readtable(joinpath(metdatadir,string(year),"met.csv"))
     n = size(M,1)
     M[:Date] = map(x->doy2date(M[x,:Year],M[x,:Day]),1:n)
