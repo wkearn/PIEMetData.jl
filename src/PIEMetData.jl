@@ -1,6 +1,6 @@
 module PIEMetData
 
-using DataFrames, Base.Dates
+using DataFrames, CSV, Base.Dates
 
 export parsemet, setmetdatadir!
 
@@ -30,10 +30,27 @@ function timepad(ds)
     map(x->lpad(string(x),4,'0'),ds)
 end
 
+const metdatatypes = [Int, # Year
+                      Int, # Code
+                      Int, # Day
+                      Int, # Time
+                      Float64, # R
+                      Float64, # Rad
+                      Float64, #PAR
+                      Float64, #T
+                      Float64, #RH
+                      Float64, #WindSpeed
+                      Float64, #WindDir
+                      Float64, #P
+                      Float64, #AvgRain
+                      Float64, # Pyru
+                      Float64  # MaxWindSpeed
+                      ]
+ 
 function parsemet(year::Int,metdatadir=met_data_directory[:_METDATA_DIR])
     ys = parse.(readdir(metdatadir))
     in(year,ys) || error("met data requested for unavailable year: $year")
-    M = readtable(joinpath(metdatadir,string(year),"met.csv"))
+    M = CSV.read(joinpath(metdatadir,string(year),"met.csv"),types=metdatatypes)
     n = size(M,1)
     M[:Date] = map(x->doy2date(M[x,:Year],M[x,:Day]),1:n)
     mstring = String[string(x) for x in M[:Date]]
