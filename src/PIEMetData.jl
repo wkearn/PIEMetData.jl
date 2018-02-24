@@ -1,14 +1,8 @@
 module PIEMetData
 
-using DataFrames, CSV, Base.Dates
+using TidalFluxConfigurations, DataFrames, CSV, Base.Dates
 
-export parsemet, setmetdatadir!
-
-met_data_directory = Dict(:_METDATA_DIR=>"")
-
-function setmetdatadir!(path,datavars=met_data_directory)
-    datavars[:_METDATA_DIR] = path
-end
+export parsemet
 
 doy(t::DateTime) = dayofyear(t) + (hour(t)+minute(t)/60)/24
 
@@ -47,7 +41,7 @@ const metdatatypes = [Int, # Year
                       Float64  # MaxWindSpeed
                       ]
  
-function parsemet(year::Int,metdatadir=met_data_directory[:_METDATA_DIR])
+function parsemet(year::Int,metdatadir=TidalFluxConfigurations.config[:_METDATA_DIR])
     ys = parse.(readdir(metdatadir))
     in(year,ys) || error("met data requested for unavailable year: $year")
     M = CSV.read(joinpath(metdatadir,string(year),"met.csv"),types=metdatatypes)

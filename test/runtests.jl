@@ -1,7 +1,7 @@
-using PIEMetData, TidalFluxExampleData, Base.Dates
+using PIEMetData, TidalFluxExampleData, TidalFluxConfigurations, Base.Dates
 using Base.Test
 
-setmetdatadir!(Pkg.dir("TidalFluxExampleData","data","met"))
+TidalFluxConfigurations.config[:_METDATA_DIR] = Pkg.dir("TidalFluxExampleData","data","met")
 @testset "parsemet" begin
     M = parsemet(2016)
     @test year.(M[:DateTime])[1] == 2016
