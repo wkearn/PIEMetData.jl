@@ -21,7 +21,7 @@ function parsemet(year::Int,metdatadir=TidalFluxConfigurations.config[:_METDATA_
     ys = parse.(readdir(metdatadir))
     in(year,ys) || error("met data requested for unavailable year: $year")
 
-    M = CSV.read(joinpath(TidalFluxConfigurations.config[:_METDATA_DIR],string(year),"newmet.csv"),
+    M = CSV.read(joinpath(TidalFluxConfigurations.config[:_METDATA_DIR],string(year),"met.csv"),
                  types=metdatatypes,
                  dateformat=DateFormat("dd-uuu-yyyy"))
     t = lpad.(M[:Time],5,"0") # Pad the time with zeros
