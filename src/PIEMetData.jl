@@ -4,57 +4,33 @@ using TidalFluxConfigurations, DataFrames, CSV, Base.Dates
 
 export parsemet
 
-doy(t::DateTime) = dayofyear(t) + (hour(t)+minute(t)/60)/24
-
-function doy2date(y,d)
-    md = [Base.Dates.MONTHDAYS...;365]
-    ms = 1:13
-    if isleapyear(y)
-        md[ms.>2]+=1
-    end
-    m = findfirst(x->x>=d,md)-1
-    if m <= 0
-        error("$d is not a valid day of the year")
-    end
-    dd = d-md[m]
-    Date(y,m,dd)    
-end
-
-function timepad(ds)
-    map(x->lpad(string(x),4,'0'),ds)
-end
-
-const metdatatypes = [Int, # Year
-                      Int, # Code
-                      Int, # Day
-                      Int, # Time
-                      Float64, # R
-                      Float64, # Rad
-                      Float64, #PAR
-                      Float64, #T
-                      Float64, #RH
-                      Float64, #WindSpeed
-                      Float64, #WindDir
-                      Float64, #P
-                      Float64, #AvgRain
-                      Float64, # Pyru
-                      Float64  # MaxWindSpeed
+const metdatatypes = [Date, # Date
+                      String, # Time
+                      Int, # Julian day
+                      Union{Missings.Missing,Float64}, # Precip
+                      Float64, # Pyranometer
+                      Float64, # PAR
+                      Float64, # Temp
+                      Float64, # RH                         
+                      Float64, # Wind
+                      Float64, # WindDir
+                      Float64, # P
                       ]
- 
+
 function parsemet(year::Int,metdatadir=TidalFluxConfigurations.config[:_METDATA_DIR])
     ys = parse.(readdir(metdatadir))
     in(year,ys) || error("met data requested for unavailable year: $year")
-    M = CSV.read(joinpath(metdatadir,string(year),"met.csv"),types=metdatatypes)
-    n = size(M,1)
-    M[:Date] = map(x->doy2date(M[x,:Year],M[x,:Day]),1:n)
-    mstring = String[string(x) for x in M[:Date]]
-    tstring = String[timepad(x) for x in M[:Time]]
-    # The PIE met data uses 2400 on day i instead of 0000 on
-    # day i+1
-    q = tstring .== "2400"
-    tstring[q] = "0000"
-    M[:DateTime] = DateTime(mstring.*tstring,
-                            DateFormat("yyyy-mm-ddHHMM"))+Day.(q)
+
+    M = CSV.read(joinpath(TidalFluxConfigurations.config[:_METDATA_DIR],string(year),"newmet.csv"),
+                 types=metdatatypes,
+                 dateformat=DateFormat("dd-uuu-yyyy"))
+    t = lpad.(M[:Time],5,"0") # Pad the time with zeros
+    M[:DateTime] = DateTime(Dates.format(M[:Date],DateFormat("yyyy-mm-dd")).*"T".*t) # Combine Date and Time
+    q = t.=="00:00"
+    M[:DateTime] .+= Day.(q)
+    rename!(M,[:BAR => :P;
+               :Wind => :WindSpeed
+               ])
     M
 end
 
